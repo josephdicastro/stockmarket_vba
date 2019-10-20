@@ -1,3 +1,12 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "ThisWorkbook"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = True
 Option Explicit
 
 Sub StockMarketData()
@@ -17,7 +26,7 @@ Sub StockMarketData()
     
     'variables for calculating greatest values
     Dim PercentChange_SearchRange, TotalYearlyVolume_SearchRange As Range
-    Dim Max_PercentChange_Row, Min_PercentChange_Row, Max_YearlyVolume_Row As Range
+    Dim Max_PercentChange_Range, Min_PercentChange_Range, Max_YearlyVolume_Range As Range
     Dim Max_PercentChange, Min_PercentChange, Max_YearlyVolume As Double
     Dim Max_PercentChange_Ticker, Min_PercentChange_Ticker, Max_YearlyVolume_Ticker As String
     
@@ -89,7 +98,7 @@ Sub StockMarketData()
                 If (CurrentTicker_ValAtClose = 0) Or (CurrentTicker_ValAtOpen = 0) Then
                     CurrentTicker_YearlyChange_Percent = 0
                 Else
-                    CurrentTicker_YearlyChange_Percent = (CurrentTicker_ValAtClose - CurrentTicker_ValAtOpen) / CurrentTicker_ValAtOpen
+                    CurrentTicker_YearlyChange_Percent = Round(((CurrentTicker_ValAtClose - CurrentTicker_ValAtOpen) / CurrentTicker_ValAtOpen), 6)
                 End If
 
                 'the totals row/column areas have to begin on the second row, but each worksheet can have different raw data counts
@@ -99,7 +108,7 @@ Sub StockMarketData()
                 PlacementInTotalsRow = NumTickers + 1
                 ws.Cells(PlacementInTotalsRow, 9) = CurrentTicker
                 ws.Cells(PlacementInTotalsRow, 10) = CurrentTicker_YearlyChange_Nominal
-                ws.Cells(PlacementInTotalsRow, 11) = FormatPercent(CurrentTicker_YearlyChange_Percent)
+                ws.Cells(PlacementInTotalsRow, 11) = CurrentTicker_YearlyChange_Percent
                 ws.Cells(PlacementInTotalsRow, 12) = CurrentTicker_YearlyVolume
                 
                 'this is the last row, so we reset our daily volume variables to 0, so they can start fresh on the next loop
@@ -129,19 +138,19 @@ Sub StockMarketData()
                 'search through the range to find the row number that the Max_PercentChange value is stored at
                 'if a value is not found, VBA throws an error, so test for range object being not nothing before accessing the object
                 
-                Set Max_PercentChange_Row = ws.Range("K:K").Find(What:=Max_PercentChange, LookIn:=xlValues)
+                Set Max_PercentChange_Range = ws.Range("K:K").Find(What:=Max_PercentChange, LookIn:=xlValues)
                     
-                    If Not Max_PercentChange_Row Is Nothing Then
-                        Max_PercentChange_Ticker = ws.Range("I" & Max_PercentChange_Row.Row).Value
+                    If Not Max_PercentChange_Range Is Nothing Then
+                        Max_PercentChange_Ticker = ws.Range("I" & Max_PercentChange_Range.Row).Value
                     End If
                
                'search through the range to find the row number that the min_PercentChange value is stored at
                 'if a value is not found, VBA throws an error, so test for range object being not nothing before accessing the object
                                
-                Set Min_PercentChange_Row = ws.Range("K:K").Find(What:=Min_PercentChange, LookIn:=xlValues)
+                Set Min_PercentChange_Range = ws.Range("K:K").Find(What:=Min_PercentChange, LookIn:=xlValues)
                     
-                    If Not Min_PercentChange_Row Is Nothing Then
-                        Min_PercentChange_Ticker = ws.Range("I" & Min_PercentChange_Row.Row).Value
+                    If Not Min_PercentChange_Range Is Nothing Then
+                        Min_PercentChange_Ticker = ws.Range("I" & Min_PercentChange_Range.Row).Value
                     End If
                 
                 
@@ -154,10 +163,10 @@ Sub StockMarketData()
                 'search through the range to find the row number that the Max_PercentChange value is stored at
                 'if a value is not found, VBA throws an error, so test for range object being not nothing before accessing the object
 
-                Set Max_YearlyVolume_Row = ws.Range("L:L").Find(What:=Max_YearlyVolume, LookIn:=xlValues)
+                Set Max_YearlyVolume_Range = ws.Range("L:L").Find(What:=Max_YearlyVolume, LookIn:=xlValues)
                 
-                    If Not Max_YearlyVolume_Row Is Nothing Then
-                        Max_YearlyVolume_Ticker = ws.Range("I" & Max_YearlyVolume_Row.Row).Value
+                    If Not Max_YearlyVolume_Range Is Nothing Then
+                        Max_YearlyVolume_Ticker = ws.Range("I" & Max_YearlyVolume_Range.Row).Value
                     End If
                 
             
@@ -172,11 +181,16 @@ Sub StockMarketData()
             ws.Range("O4") = Max_YearlyVolume_Ticker
     
             ws.Range("P1") = "Value"
-            ws.Range("P2") = FormatPercent(Max_PercentChange)
-            ws.Range("P3") = FormatPercent(Min_PercentChange)
+            ws.Range("P2") = Max_PercentChange
+            ws.Range("P3") = Min_PercentChange
             ws.Range("P4") = Max_YearlyVolume
             
             ws.Columns("A:P").AutoFit
+            
+            'set columns to display as percent
+            ws.Range("K:K").NumberFormat = "0.00%"
+            ws.Range("P2").NumberFormat = "0.00%"
+            ws.Range("P3").NumberFormat = "0.00%"
              
 
                 
@@ -206,7 +220,7 @@ Sub StockMarketData()
         LastRow_RawData = 0
         LastRow_Totals = 0
        
-    Next ws
+       Next ws
 
     MsgBox ("Analysis Complete")
 
@@ -224,6 +238,12 @@ errHandler:
         
 End Sub
         
+
+
+
+
+
+
 
 
 
