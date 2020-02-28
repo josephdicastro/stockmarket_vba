@@ -1,5 +1,3 @@
-# VBA Challenge
+# 2014 - 2016 Stock Analysis in Excel VBA
 
-Screenshots, .vbs file, and .xlsm file uploaded. 
-
-The .vbs file contains the main homework, and the Challenege code. I also created created the conditional formatting for the worksheets through VBA. 
+A demonstration of VBA in Excel, showing programmatic control of Excel's data structures, looping mechanisms, and formatting options.
